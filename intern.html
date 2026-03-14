@@ -249,6 +249,18 @@
 
     }
 
+    .avatarCircle::after {
+      content: "📷";
+      position: absolute;
+      font-size: 20px;
+      opacity: 0;
+      transition: 0.3s;
+    }
+
+    .avatarCircle:hover::after {
+      opacity: 1;
+    }
+
     .avatarCircle:hover {
 
       transform: scale(1.08);
@@ -261,7 +273,6 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      display: none;
     }
 
     /* ================= BADGE ================= */
@@ -964,11 +975,13 @@
             <div class="profileTopRow">
 
               <div class="avatarCircle" onclick="triggerPhotoUpload()">
-                <img id="profileAvatarImg" src="" />
+
+                <img id="profileAvatarImg" src="" style="display:none;" />
+
                 <span id="avatarFallback"></span>
 
-                <!-- Hidden File Input -->
                 <input type="file" id="photoUpload" accept="image/*" hidden />
+
               </div>
 
               <div class="profileTextBlock">
@@ -1391,10 +1404,14 @@
     }
 
     async function init() {
-      await loadToday();
-      await loadHistory();
-      await loadMyChat();
-      await loadProfile();
+
+      const activePage =
+        document.querySelector(".pageSection.active")?.id;
+
+      if (activePage === "todayPage") await loadToday();
+      if (activePage === "historyPage") await loadHistory();
+      if (activePage === "messagesPage") await loadMyChat();
+      if (activePage === "profilePage") await loadProfile();
 
     }
 
@@ -1429,13 +1446,30 @@
       const fallback = document.getElementById("avatarFallback");
 
       if (intern.Photo && intern.Photo !== "") {
-        avatarImg.src = intern.Photo;
-        avatarImg.style.display = "block";
-        fallback.style.display = "none";
+
+        const avatarImg = document.getElementById("profileAvatarImg");
+        const fallback = document.getElementById("avatarFallback");
+
+        avatarImg.src = intern.Photo + "?t=" + Date.now();
+
+        avatarImg.onload = function () {
+          avatarImg.style.display = "block";
+          fallback.style.display = "none";
+        };
+
+        avatarImg.onerror = function () {
+          avatarImg.style.display = "none";
+          fallback.style.display = "block";
+        };
+
       } else {
+
         avatarImg.style.display = "none";
         fallback.style.display = "block";
-        fallback.innerText = intern.Name.charAt(0).toUpperCase();
+
+        fallback.innerText =
+          (intern.Name || "U").charAt(0).toUpperCase();
+
       }
 
       // Dynamic Rank Logic
@@ -1592,7 +1626,7 @@
         if (activePage === "messagesPage") await loadMyChat(true);
 
 
-      }, 15000);
+      }, 60000);
     }
 
 
@@ -1771,11 +1805,11 @@
       }
 
       // Aapke purane data load functions yahan call hote rahenge
-      if (pageId === "todayPage") await loadToday();
-      if (pageId === "historyPage") await loadHistory();
-      if (pageId === "profilePage") await loadProfile();
-      if (pageId === "messagesPage") await loadMyChat();
-      if (pageId === "batchPage") await loadMyBatchInterns();
+      if (pageId === "todayPage") loadToday();
+      if (pageId === "historyPage") loadHistory();
+      if (pageId === "profilePage") loadProfile();
+      if (pageId === "messagesPage") loadMyChat();
+      if (pageId === "batchPage") loadMyBatchInterns();
     }
 
     // ✅ 3. Sidebar ke bahar click karne par band karne ka option (Best for Mobile)
