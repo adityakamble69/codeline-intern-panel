@@ -526,13 +526,15 @@
       height: 90px;
 
       border-radius: 50%;
-      object-fit: cover;
 
       border: 3px solid #7c00ff;
 
-      box-shadow: 0 0 15px rgba(124, 0, 255, .6);
+      box-shadow:
+        0 0 10px rgba(124, 0, 255, .6),
+        0 0 25px rgba(124, 0, 255, .3);
 
       margin-bottom: 10px;
+
     }
 
     .modalContent h2 {
@@ -550,38 +552,74 @@
 
     .projectItem {
 
-      background: #171723;
+      background: linear-gradient(145deg, #141421, #1c1c2a);
 
-      border: 1px solid #2a2a40;
+      border: 1px solid rgba(255, 255, 255, 0.08);
 
-      padding: 10px 12px;
+      padding: 14px 16px;
 
-      border-radius: 8px;
+      border-radius: 12px;
 
-      margin-top: 6px;
+      margin-top: 10px;
 
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+
+      grid-template-columns: 1fr auto;
+
+      gap: 10px;
+
       align-items: center;
 
-      font-size: 13px;
+      transition: .25s;
 
-      transition: .2s;
     }
 
     .projectItem:hover {
-      background: #202032;
+
       border-color: #7c00ff;
+
+      transform: translateY(-2px);
+
+      box-shadow: 0 10px 25px rgba(0, 0, 0, .6);
+
+    }
+
+    .projectItem b {
+
+      font-size: 14px;
+
+      line-height: 1.4;
+
+      font-weight: 600;
+
     }
 
     .projectItem a {
-      color: #8c7dff;
-      font-size: 12px;
+
+      color: #9d7cff;
+
+      font-size: 13px;
+
       text-decoration: none;
+
+      padding: 6px 12px;
+
+      border-radius: 6px;
+
+      border: 1px solid rgba(157, 124, 255, 0.4);
+
+      transition: .2s;
+
     }
 
     .projectItem a:hover {
-      text-decoration: underline;
+
+      background: #7c00ff;
+
+      color: white;
+
+      border-color: #7c00ff;
+
     }
 
     /* ================= MODAL BUTTON ================= */
@@ -1014,12 +1052,15 @@
 
     <div class="modalContent">
 
-      <button class="btn danger" onclick="closeProfile()">Close</button>
+      <div style="display:flex;justify-content:flex-end;">
+        <button class="btn ghost" onclick="closeProfile()">Close</button>
+      </div>
 
-      <div id="profileData"></div>
+      <div id="profileData" style="margin-top:10px;"></div>
 
-      <h3 style="margin-top:15px;">Projects</h3>
-      <div id="profileProjects"></div>
+      <h3 class="glowTitle" style="margin-top:20px;">🚀 Projects</h3>
+
+      <div id="profileProjects" style="margin-top:10px;"></div>
 
     </div>
 
@@ -1833,13 +1874,27 @@
 
       document.getElementById("profileData").innerHTML = `
 
-<img src="${intern.Photo || 'logo.png'}" style="width:80px;border-radius:50%">
+<img src="${intern.Photo || 'logo.png'}"
+style="
+width:90px;
+height:90px;
+border-radius:50%;
+border:3px solid #7c00ff;
+box-shadow:0 0 15px rgba(124,0,255,.6);
+margin-bottom:10px;
+">
 
-<h2>${intern.Name}</h2>
+<h2 style="margin:5px 0;">${intern.Name}</h2>
 
-<p>${intern.Bio || "No bio yet"}</p>
+<p style="color:#aaa;font-size:13px;">Intern ID: ${intern.InternID}</p>
 
-<p>Approved Tasks: ${intern.approved}</p>
+<p style="margin-top:6px;">
+${intern.Bio || "No profile description added"}
+</p>
+
+<div class="taskCount">
+✅ ${intern.approved} Approved Tasks
+</div>
 
 `;
 
@@ -1855,9 +1910,13 @@
 
 <div class="projectItem">
 
-<b>${p.title}</b>
+<div class="projectTitle">
+${p.title}
+</div>
 
-<a href="${p.link}" target="_blank">Open Project</a>
+<a href="${p.link}" target="_blank">
+View Project
+</a>
 
 </div>
 
