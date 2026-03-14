@@ -4,7 +4,6 @@ const API_URL =
 // ===============================
 // Loader + Toast
 // ===============================
-
 let LOADER_LOCK = false;
 
 function showLoader(show = true, text = "Loading...", silent = false) {
@@ -63,14 +62,13 @@ async function apiPOST(payload, silent = false) {
     const res = await fetch(API_URL, {
       method: "POST",
       headers: {
-        "Content-Type": "text/plain;charset=utf-8"
+        "Content-Type": "text/plain;charset=utf-8",
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
 
     const text = await res.text();
     return JSON.parse(text);
-
   } catch (err) {
     console.error("POST Error:", err);
     return { success: false, message: "Server connection failed ❌" };
@@ -86,13 +84,12 @@ async function apiGET(params = {}, silent = false) {
     const url = API_URL + "?" + new URLSearchParams(params).toString();
 
     const res = await fetch(url, {
-      method: "GET"
+      method: "GET",
     });
 
     const text = await res.text();
 
     return JSON.parse(text);
-
   } catch (err) {
     console.error("GET Error:", err);
     return { success: false, message: "Server connection failed ❌" };
@@ -127,13 +124,26 @@ async function uploadPhoto(e) {
     showLoader(false);
 
     if (data.success) {
+      // update session
       intern.Photo = data.photoUrl;
       saveSession("intern", intern);
 
+      // update UI
+      const img = document.getElementById("profileAvatarImg");
+      const fallback = document.getElementById("avatarFallback");
+
+      if (img) {
+        img.src = data.photoUrl + "&t=" + Date.now();
+        img.style.display = "block";
+      }
+
+      if (fallback) fallback.style.display = "none";
+
       toast("Photo Updated ✅", "success");
+
       loadProfile();
     } else {
-      toast(data.message, "error");
+      toast(data.message || "Upload failed ❌", "error");
     }
   };
 
