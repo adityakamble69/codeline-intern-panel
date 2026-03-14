@@ -1,0 +1,1960 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ✅ Section Switch */
+    .pageSection {
+      display: none;
+    }
+
+    .pageSection.active {
+      display: block;
+    }
+
+    /* ✅ small top heading inside each page */
+    .pageTop {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .pageTop h2 {
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+    }
+
+    .pageTop p {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    /* ✅ 3 dot button */
+    .dotBtn {
+      padding: 8px 12px;
+      border-radius: 14px;
+      font-weight: 900;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .dotBtn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow: 0 0 25px rgba(124, 0, 255, 0.12);
+      transform: translateY(-1px);
+      transition: 0.2s;
+    }
+
+    /* ✅ Modal */
+    .modalOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 16px;
+    }
+
+    .modalOverlay.show {
+      display: flex;
+    }
+
+    .modalCard {
+      width: min(1150px, 96vw);
+      max-height: 90vh;
+      overflow: auto;
+      border-radius: 22px;
+      border: 1px solid rgba(124, 0, 255, 0.25);
+      background: rgba(10, 8, 18, 0.96);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    .card canvas {
+      max-height: 220px;
+    }
+
+    /* ===============================
+   Intern Hover Tooltip
+================================ */
+
+    .internCell {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .internTooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) scale(0.9);
+
+      background: linear-gradient(135deg, #7C00FF, #B100FF);
+      color: #fff;
+
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+
+      white-space: nowrap;
+
+      opacity: 0;
+      pointer-events: none;
+      transition: 0.25s;
+
+      box-shadow: 0 8px 25px rgba(124, 0, 255, 0.35);
+      z-index: 100;
+    }
+
+    /* arrow */
+    .internTooltip::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+
+      border-width: 6px;
+      border-style: solid;
+      border-color: #7C00FF transparent transparent transparent;
+    }
+
+    .internCell:hover .internTooltip {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+    }
+
+    /* ===============================
+   MOBILE RESPONSIVE ADMIN PANEL
+================================ */
+
+    /* Layout Fix */
+    .appShell {
+      display: flex;
+      gap: 16px;
+    }
+
+    /* Sidebar Default */
+    .sidebar {
+      width: 260px;
+      transition: 0.3s;
+    }
+
+    /* Mobile Menu Button Hidden Desktop */
+    .mobileMenuBtn {
+      display: none;
+    }
+
+    /* ===============================
+   MOBILE RESPONSIVE
+================================ */
+
+    @media (max-width:1000px) {
+
+      .container {
+        max-width: 420px;
+        padding: 12px;
+      }
+
+      .appShell {
+        flex-direction: column;
+        gap: 0;
+        position: relative;
+      }
+
+      /* Sidebar dropdown under button */
+
+      .sidebar {
+        position: absolute;
+        top: 70px;
+        left: 12px;
+        right: 12px;
+        width: auto;
+        height: auto;
+
+        transform: scale(0.95);
+        opacity: 0;
+        pointer-events: none;
+
+        transition: 0.25s;
+        z-index: 9999;
+      }
+
+      .sidebar.show {
+        transform: scale(1);
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .mobileMenuBtn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .topbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .actions .btn {
+        width: 100%;
+      }
+
+      .grid2,
+      .row2 {
+        grid-template-columns: 1fr;
+      }
+
+      .kpis {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      table {
+        min-width: 700px;
+      }
+
+      .modalCard {
+        max-width: 420px;
+      }
+
+    }
+
+    /* ===============================
+   ADVANCED MOBILE RESPONSIVE FIX
+================================ */
+
+    @media (max-width: 1000px) {
+
+      /* Container ko full width aur safe padding dena */
+      .container {
+        max-width: 100% !important;
+        padding: 10px !important;
+      }
+
+      .appShell {
+        flex-direction: column;
+        gap: 0;
+        position: relative;
+      }
+
+      /* 📱 Sidebar: Ab ye overlay ki tarah dikhega */
+      .sidebar {
+        position: fixed !important;
+        /* Screen par fixed rahega */
+        top: 0;
+        left: -300px;
+        /* Default hide rahega */
+        width: 280px !important;
+        height: 100vh !important;
+        z-index: 10000;
+        background: #0a0812 !important;
+        /* Background dark rakha hai */
+        transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 20px 0 50px rgba(0, 0, 0, 0.8);
+        padding: 20px !important;
+        border-radius: 0 20px 20px 0 !important;
+      }
+
+      /* Sidebar dikhane ke liye class */
+      .sidebar.show {
+        left: 0;
+      }
+
+      /* 🍔 Mobile Menu Button: Har page par dikhega */
+      .mobileMenuBtn {
+        display: flex !important;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 55px;
+        height: 55px;
+        background: linear-gradient(135deg, #7C00FF, #B100FF);
+        border-radius: 50%;
+        z-index: 9999;
+        color: white;
+        font-size: 24px;
+        box-shadow: 0 10px 25px rgba(124, 0, 255, 0.4);
+        border: none;
+      }
+
+      /* Navigation Link ko mobile me bada aur clickable banana */
+      .nav a {
+        padding: 15px !important;
+        margin-bottom: 8px !important;
+        font-size: 14px !important;
+      }
+
+      .topbar {
+        padding: 10px;
+        margin-bottom: 15px;
+      }
+
+      /* Grid Layouts: Single column me stack karna */
+      .grid2,
+      .row2,
+      .miniGrid {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+      }
+
+      /* KPI cards ko mobile me 2-column grid dena */
+      .kpis {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+      }
+
+      /* Tables: Horizontal scroll enable karna taaki layout na toote */
+      .tableWrap {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 12px;
+      }
+
+      table {
+        min-width: 650px !important;
+        /* Table ki readability ke liye */
+      }
+
+      /* Modal ko mobile screen ke hisaab se fit karna */
+      .modalCard {
+        width: 95vw !important;
+        max-height: 85vh !important;
+        margin: 10px;
+        padding: 15px !important;
+      }
+
+      /* Buttons ko mobile me full width touch targets dena */
+      .actions {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .actions .btn {
+        flex: 1;
+        font-size: 12px;
+        padding: 10px !important;
+      }
+    }
+
+    @media (max-width: 1000px) {
+      /* ... baki purana code ... */
+
+      .topbar {
+        display: flex !important;
+        flex-direction: row !important;
+        /* Items line mein rahenge */
+        align-items: center !important;
+        justify-content: flex-start !important;
+        padding: 12px 20px !important;
+        /* Sahi spacing taaki background dikhe */
+        min-height: 80px !important;
+        gap: 15px !important;
+        background: rgba(255, 255, 255, 0.03) !important;
+        /* Background wapas lane ke liye */
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: var(--radius) !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      .mobileMenuBtn {
+        display: flex !important;
+        position: relative !important;
+        /* Static/Relative taaki background ke andar rahe */
+        width: 45px !important;
+        height: 45px !important;
+        flex-shrink: 0 !important;
+        z-index: 10 !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .titleWrap {
+        flex: 1 !important;
+        text-align: left !important;
+      }
+
+      /* Actions button ko control karne ke liye */
+      .actions {
+        display: flex !important;
+        gap: 8px !important;
+      }
+    }
+
+    .taskDesc {
+      display: none;
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .taskDesc.show {
+      display: block;
+    }
+
+    .viewBtn {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #B100FF;
+      cursor: pointer;
+    }
+
+    .viewBtn:hover {
+      text-decoration: underline;
+    }
+
+    .columnChart {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      height: 240px;
+      padding: 20px 10px 10px;
+      gap: 20px;
+    }
+
+    .colItem {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+
+    .colBarWrap {
+      width: 40px;
+      height: 180px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+    }
+
+    .colBar {
+      width: 100%;
+      height: 0%;
+      border-radius: 20px;
+      background: linear-gradient(180deg, #B100FF, #7C00FF);
+      box-shadow: 0 0 20px rgba(124, 0, 255, 0.5);
+      transition: height 1.2s ease;
+    }
+
+    .colPercent {
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .colLabel {
+      font-size: 12px;
+      margin-top: 8px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .batchPerfBox {
+      display: flex;
+      align-items: flex-end;
+      /* neeche se align hoga */
+      justify-content: center;
+      /* center me aayega */
+      gap: 40px;
+      /* dono ke beech space */
+      height: 240px;
+      padding: 20px 10px 10px;
+    }
+
+    .topBatchBlock {
+      margin-bottom: 20px;
+    }
+
+    .topBatchTitle {
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      color: #B100FF;
+      letter-spacing: 0.5px;
+    }
+
+    .topInternCard {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-radius: 14px;
+      margin-bottom: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: 0.2s;
+    }
+
+    /* ===== Full Analysis Table Fix ===== */
+
+    #analysisModal table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    #analysisModal th,
+    #analysisModal td {
+      padding: 12px 16px;
+    }
+
+    #analysisModal th {
+      text-align: left;
+      font-size: 13px;
+      font-weight: 700;
+      opacity: 0.8;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    #analysisModal td {
+      font-size: 13px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Rank column */
+    #analysisModal td:nth-child(1),
+    #analysisModal th:nth-child(1) {
+      width: 80px;
+      text-align: left;
+    }
+
+    /* Name column */
+    #analysisModal td:nth-child(2),
+    #analysisModal th:nth-child(2) {
+      text-align: left;
+    }
+
+    /* Avg Grade column */
+    #analysisModal td:nth-child(3),
+    #analysisModal th:nth-child(3) {
+      text-align: center;
+    }
+
+    /* Approved column */
+    #analysisModal td:nth-child(4),
+    #analysisModal th:nth-child(4) {
+      text-align: center;
+      width: 100px;
+    }
+
+    .topInternCard:hover {
+      background: rgba(124, 0, 255, 0.08);
+      border: 1px solid rgba(124, 0, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .rankBadge {
+      font-size: 18px;
+      margin-right: 10px;
+    }
+
+    .topInternLeft {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topInternName {
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .topInternScore {
+      font-weight: 900;
+      color: #7C00FF;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<body>
+  <div class="container">
+    <div class="appShell">
+
+      <!-- ✅ SIDEBAR -->
+      <aside class="sidebar">
+
+        <div class="sideTop">
+          <div class="brandBox">
+            <div class="brandLogo">
+              <img src="logo.png" alt="COD Logo">
+            </div>
+            <div class="brandText">
+              <h3>COD PANEL</h3>
+              <p>Admin Control</p>
+            </div>
+          </div>
+
+          <div class="rolePill" id="adminPill">Admin</div>
+        </div>
+
+        <!-- ✅ MENU -->
+        <div class="nav" id="adminNav">
+          <a class="active" href="javascript:void(0)" onclick="switchPage('studentsPage', this)">👨‍🎓 Students</a>
+          <a href="javascript:void(0)" onclick="switchPage('batchPage', this)">🧩 Batch + Intern Create</a>
+          <a href="javascript:void(0)" onclick="switchPage('assignPage', this)">📌 Assign Task</a>
+          <a href="javascript:void(0)" onclick="switchPage('subsPage', this)">✅ Submissions</a>
+          <a href="javascript:void(0)" onclick="switchPage('incompletePage', this)">⚠️ Incomplete</a>
+          <a href="javascript:void(0)" onclick="switchPage('analyticsPage', this)">📊 Analytics</a>
+          <a href="javascript:void(0)" onclick="switchPage('editRequestsPage', this)">🔐 Edit Requests</a>
+        </div>
+
+        <div class="sideFooter">
+          ✅ Max 20 interns per batch<br />
+          ✅ Batch + Individual task<br />
+          ✅ Grade + remarks<br />
+          ✅ Full tracking
+        </div>
+
+      </aside>
+
+      <!-- ✅ MAIN -->
+      <main class="main">
+
+        <!-- ✅ TOPBAR (Always visible) -->
+        <div class="topbar">
+          <button class="btn ghost mobileMenuBtn" onclick="toggleSidebar()">☰</button>
+
+          <div class="titleWrap">
+            <h1>⚡CODELINE.AI</h1>
+            <p>Software training institute in Maharashtra</p>
+          </div>
+
+          <div class="actions">
+            <button class="btn ghost" onclick="init()">🔄 Refresh</button>
+            <button class="btn danger" onclick="logout()">Logout</button>
+          </div>
+        </div>
+
+        <!-- ✅ PAGE 1: STUDENTS -->
+        <section class="card pageSection active" id="studentsPage">
+          <div class="pageTop">
+            <div>
+              <h2>👨‍🎓 All Students List</h2>
+              <!-- <p>Batch-wise filter + A-Z sorting + 3 dot details view</p> -->
+            </div>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;"> </div>
+          </div>
+
+          <div class="row2">
+            <div>
+              <label>Batch Filter</label>
+              <select id="filterBatch"></select>
+            </div>
+          </div>
+
+          <div>
+            <label>Total Students</label>
+            <div style="
+      padding:10px 14px;
+      border-radius:12px;
+      background:rgba(124,0,255,0.08);
+      border:1px solid rgba(124,0,255,0.25);
+      font-weight:900;
+      text-align:center;
+      min-width:120px;
+    ">
+              <span id="batchCount">0</span>
+            </div>
+          </div>
+
+          <div class="tableWrap" style="margin-top:12px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>InternID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Batch</th>
+                  <th>Duration</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="internTable"></tbody>
+            </table>
+          </div>
+
+          <!-- <div class="small">✅ “⋮” click → full intern overview (history + submissions + streak)</div> -->
+        </section>
+
+        <!-- ✅ PAGE 2: BATCH + INTERN CREATE -->
+        <section class="card pageSection" id="batchPage">
+          <div class="pageTop">
+            <div>
+              <h2>🧩 Batch + Intern Create</h2>
+              <p>Batch mandatory • Max 20 interns in 1 batch</p>
+            </div>
+          </div>
+
+          <div class="grid2">
+
+            <!-- Create Batch -->
+            <div class="card">
+              <div class="cardHead">
+                <div>
+                  <h2>🧩 Create Batch</h2>
+                  <!-- <span>Auto BatchID generate</span> -->
+                </div>
+              </div>
+
+              <label>Batch Name</label>
+              <input id="batchName" placeholder="BATCH-1 / JAN-2026" />
+
+              <button class="btn primary" onclick="createBatch()">Create Batch</button>
+              <div class="small" id="batchMsg"></div>
+            </div>
+
+            <!-- Create Intern -->
+            <div class="card">
+              <div class="cardHead">
+                <div>
+                  <h2>➕ Create Intern</h2>
+                  <span>Intern ID will auto generate</span>
+                </div>
+              </div>
+
+              <label>Name</label>
+              <input id="inName" placeholder="Intern Name" />
+
+              <label>Email</label>
+              <input id="inEmail" type="email" autocomplete="email" placeholder="intern@gmail.com" />
+
+              <label>Select Batch</label>
+              <select id="inBatch"></select>
+
+              <label>Duration</label>
+              <select id="inDuration">
+                <option>6 Months</option>
+                <option>9 Months</option>
+              </select>
+
+              <button class="btn primary" onclick="createIntern()">Create Intern</button>
+              <div class="small" id="createdInternText"></div>
+
+              <div class="small">
+                <!-- ✅ Intern ko bolo: Index page me password set kare. -->
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ✅ PAGE 3: ASSIGN TASK -->
+        <section class="card pageSection" id="assignPage">
+          <div class="pageTop">
+            <div>
+              <h2>📌 Assign Task</h2>
+              <!-- <p>Option 1: Batch-wise • Option 2: Individual Task</p> -->
+            </div>
+          </div>
+
+          <label>Date</label>
+          <input id="taskDate" type="date" />
+
+          <label>Task Title</label>
+          <input id="taskTitle" placeholder="Day X: Task name" />
+
+          <label>Description</label>
+          <textarea id="taskDesc" placeholder="Write full task details..."></textarea>
+
+          <div class="row2">
+
+            <div>
+              <label>Assign Batch-wise</label>
+              <select id="assignBatch"></select>
+              <button class="btn primary" onclick="assignBatchTask()">Assign Batch Task</button>
+            </div>
+
+            <div>
+              <label>Assign Individual Intern</label>
+              <input id="assignInternId" placeholder="INT0001" />
+              <button class="btn" onclick="assignIndividualTask()">Assign Individual Task</button>
+            </div>
+
+          </div>
+
+          <div class="small">
+            <!-- ✅ Individual task assign hote hi intern side “Today’s Task” me show hoga. -->
+          </div>
+        </section>
+
+        <!-- ✅ PAGE 4: SUBMISSIONS -->
+        <section class="card pageSection" id="subsPage">
+          <div class="pageTop">
+            <div>
+              <h2>✅ Submissions</h2>
+              <p>Pending submissions check + grade assign</p>
+            </div>
+
+            <button class="btn" onclick="loadSubmissions()">🔄 Refresh</button>
+          </div>
+
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>SubmissionID</th>
+                  <th>TaskID</th>
+                  <th>InternID</th>
+                  <th>Link</th>
+                  <th>Details</th>
+                  <th>SubmittedAt</th>
+                  <th>Grade</th>
+                  <th>Remarks</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="subsTable"></tbody>
+            </table>
+          </div>
+
+          <!-- <div class="small">✅ Approve/Reject ke baad intern history update ho jayegi.</div> -->
+        </section>
+
+        <!-- ✅ PAGE: EDIT REQUESTS -->
+        <section class="card pageSection" id="editRequestsPage">
+
+          <div class="pageTop">
+            <div>
+              <h2>🔐 Edit Permission Requests</h2>
+              <p>Interns requesting submission edit approval</p>
+            </div>
+
+            <button class="btn" onclick="loadEditRequests()">🔄 Refresh</button>
+          </div>
+
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>SubmissionID</th>
+                  <th>InternID</th>
+                  <th>TaskID</th>
+                  <th>Requested At</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="editReqTable"></tbody>
+            </table>
+          </div>
+
+        </section>
+
+        <!-- ✅ PAGE: INCOMPLETE STUDENTS -->
+        <section class="card pageSection" id="incompletePage">
+          <div class="pageTop">
+            <div>
+              <h2>⚠️ Incomplete Students</h2>
+              <p>Those who did not submit today's task</p>
+            </div>
+            <button class="btn" onclick="loadIncomplete()">🔄 Refresh</button>
+          </div>
+
+          <div style="
+          padding:8px 14px;
+          border-radius:12px;
+          background:rgba(255,0,0,0.08);
+          border:1px solid rgba(255,0,0,0.25);
+          font-weight:900;
+          min-width:120px;
+          text-align:center;
+          ">
+            <span id="incompleteCount">0</span> Students
+          </div>
+
+
+          <div class="tableWrap" style="margin-top:12px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>InternID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Batch</th>
+                  <th>Pending</th>
+                  <th>Message</th>
+                </tr>
+              </thead>
+              <tbody id="incompleteTable"></tbody>
+            </table>
+          </div>
+
+          <div class="small">
+            ✅ The message will be auto deleted in 48 hours.
+          </div>
+        </section>
+
+        <section class="card pageSection" id="analyticsPage">
+
+          <div class="pageTop">
+            <div>
+              <h2>📊 Analytics Dashboard</h2>
+              <p>System insights and performance</p>
+            </div>
+            <button class="btn" onclick="loadAnalytics()">🔄 Refresh</button>
+          </div>
+
+          <div class="kpis" style="grid-template-columns:repeat(7,1fr);">
+
+            <div class="kpi"><b id="kTotal">0</b><small>Total Interns</small></div>
+            <div class="kpi"><b id="kActive">0</b><small>Active</small></div>
+            <div class="kpi"><b id="kPending">0</b><small>Pending</small></div>
+            <div class="kpi"><b id="kApproved">0</b><small>Approved</small></div>
+            <div class="kpi"><b id="kPercent">0%</b><small>Approval %</small></div>
+
+            <!-- NEW -->
+            <div class="kpi"><b id="kAvg">0</b><small>Average Grade</small></div>
+            <div class="kpi"><b id="kDay">-</b><small>Most Active Day</small></div>
+
+          </div>
+
+
+          <div class="grid2" style="margin-top:18px; grid-template-columns:1fr 1fr;">
+
+
+
+            <div class="card">
+              <h3>Batch Performance %</h3>
+              <div id="batchPerformanceBox" class="batchPerfBox"></div>
+            </div>
+
+
+            <!-- NEW -->
+            <div class="card">
+              <h3>Top Interns</h3>
+              <div id="topInternsBox"></div>
+            </div>
+
+          </div>
+
+
+        </section>
+
+
+        <!-- ✅ CHAT MODAL (Admin ↔ Intern) -->
+        <div id="chatModal" class="modalOverlay">
+          <div class="modalCard">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+              <div>
+                <div style="font-family:Orbitron,Inter;font-size:16px;font-weight:900;">💬 Chat</div>
+                <div style="color:var(--muted);font-size:12px;margin-top:6px;" id="chatMeta">Loading...</div>
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <button class="btn" onclick="adminClearChat()">🧹 Clear Chat</button>
+                <button class="btn danger" onclick="closeChat()">Close</button>
+              </div>
+            </div>
+
+            <div class="tableWrap" style="margin-top:14px;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Sender</th>
+                    <th>Message</th>
+                    <th>Time</th>
+                  </tr>
+                </thead>
+                <tbody id="chatTable"></tbody>
+              </table>
+            </div>
+
+            <label style="margin-top:12px;">Send Message</label>
+            <input id="chatMsg" placeholder="Write message..." />
+            <button class="btn primary" onclick="adminSendMsg()">Send</button>
+          </div>
+        </div>
+
+        <!-- ✅ FULL BATCH ANALYSIS MODAL -->
+        <div id="analysisModal" class="modalOverlay">
+          <div class="modalCard">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <h3>📊 Full Batch Analysis</h3>
+              <button class="btn danger" onclick="closeAnalysis()">Close</button>
+            </div>
+
+            <div class="tableWrap" style="margin-top:12px;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Name</th>
+                    <th>Avg Grade</th>
+                    <th>Approved</th>
+                  </tr>
+                </thead>
+                <tbody id="analysisTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- ✅ INTERN OVERVIEW MODAL -->
+  <div id="internModal" class="modalOverlay">
+    <div class="modalCard">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+        <div>
+          <div style="font-family:Orbitron,Inter;font-size:16px;font-weight:900;">
+            👨‍🎓 Intern Overview
+          </div>
+          <div style="color:var(--muted);font-size:12px;margin-top:6px;" id="modalMeta">
+            Loading...
+          </div>
+        </div>
+
+        <button class="btn danger" onclick="closeInternModal()">Close</button>
+      </div>
+
+      <div style="margin-top:14px;border-top:1px solid rgba(255,255,255,0.10);padding-top:14px;">
+        <div class="kpis" style="grid-template-columns:repeat(4,1fr);">
+          <div class="kpi"><b id="mStreak">0</b><small>Streak</small></div>
+          <div class="kpi"><b id="mTotalSub">0</b><small>Total Submissions</small></div>
+          <div class="kpi"><b id="mPending">0</b><small>Pending</small></div>
+          <div class="kpi"><b id="mApproved">0</b><small>Approved</small></div>
+        </div>
+
+        <div style="margin-top:14px;" class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Task</th>
+                <th>Status</th>
+                <th>Grade</th>
+                <th>Submission</th>
+              </tr>
+            </thead>
+            <tbody id="modalHistory"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Loader + Toast -->
+  <div id="loaderOverlay" class="loaderOverlay">
+    <div class="loaderCard">
+      <div class="spinner"></div>
+      <div id="loaderText">Loading...</div>
+    </div>
+  </div>
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+
+  <script>
+
+    function escapeHTML(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    let currentInternRequestId = 0;   // 🔥 MOVE HERE
+    let batchChart;
+
+
+    const visitedAdminPages = {
+      studentsPage: false,
+      batchPage: false,
+      assignPage: false,
+      subsPage: false,
+      incompletePage: false
+
+    };
+
+
+
+    // const admin = getSession("admin");
+    // if (!admin) window.location.href = "index.html";
+
+    const admin = getSession("admin");
+
+    if (!admin || !admin.adminId) {
+      window.location.href = "index.html";
+      throw new Error("Admin session missing");
+    }
+
+
+    // ✅ Default date
+    document.getElementById("taskDate").value = new Date().toISOString().slice(0, 10);
+
+
+
+    // ✅ Switch Page Function
+    async function switchPage(pageId, navEl) {
+      document.querySelectorAll(".pageSection").forEach(s => s.classList.remove("active"));
+      document.getElementById(pageId).classList.add("active");
+
+      document.querySelectorAll("#adminNav a").forEach(a => a.classList.remove("active"));
+      navEl.classList.add("active");
+
+      // ✅ FIRST VISIT = loader ON, next = silent
+      const firstTime = !visitedAdminPages[pageId];
+      visitedAdminPages[pageId] = true;
+
+      // ✅ Load data based on section
+      if (pageId === "studentsPage") await loadInterns(!firstTime);
+      if (pageId === "subsPage") await loadSubmissions(!firstTime);
+      if (pageId === "incompletePage") await loadIncomplete(!firstTime);
+
+      // ✅ Batch page (optional)
+      if (pageId === "batchPage") await loadBatches(!firstTime);
+
+      // ✅ Assign page (optional - only batches reload)
+      if (pageId === "assignPage") await loadBatches(!firstTime);
+      if (pageId === "analyticsPage") await loadAnalytics(!firstTime);
+      if (pageId === "editRequestsPage") await loadEditRequests(!firstTime);
+    }
+
+    // ✅ Init
+    async function init() {
+
+      // ✅ Email Auto Gmail Suggestion
+      const emailInput = document.getElementById("inEmail");
+
+      if (emailInput) {
+        emailInput.addEventListener("input", function () {
+
+          let value = this.value;
+
+          if (value.endsWith("@")) {
+            this.value = value + "gmail.com";
+          }
+
+        });
+
+      }
+      if (typeof sendAdminLoginInfo === "function") {
+        // sendAdminLoginInfo();
+      }
+
+      const filter = document.getElementById("filterBatch");
+      if (filter) {
+        filter.addEventListener("change", () => {
+          loadInterns();
+        });
+      }
+
+      try {
+        await loadBatches();
+        await loadInterns(true);
+      } catch (e) {
+        console.log("Init load failed");
+      }
+    }
+
+    async function loadBatches(silent = false) {
+      const data = await apiGET({
+        action: "getBatches",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass
+      });
+
+      if (!data.success) { toast(data.message, "error"); return; }
+
+      const list = data.batches || [];
+
+      document.getElementById("filterBatch").innerHTML =
+        `<option value="">All</option>` +
+        list.map(b => `<option value="${b.BatchID}">${b.BatchName} (${b.BatchID})</option>`).join("");
+
+      document.getElementById("inBatch").innerHTML =
+        list.map(b => `<option value="${b.BatchID}">${b.BatchName} (${b.BatchID})</option>`).join("");
+
+      document.getElementById("assignBatch").innerHTML =
+        list.map(b => `<option value="${b.BatchID}">${b.BatchName} (${b.BatchID})</option>`).join("");
+    }
+
+    async function createBatch() {
+      const batchName = document.getElementById("batchName").value.trim();
+
+      const data = await apiPOST({
+        action: "adminCreateBatch",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass,
+        batchName
+      });
+
+      if (data.success) {
+        toast("Batch Created ✅", "success");
+        document.getElementById("batchMsg").innerHTML = `✅ Created: <b>${data.batchName}</b> (${data.batchId})`;
+        document.getElementById("batchName").value = "";
+        loadBatches();
+      } else toast(data.message, "error");
+    }
+
+    async function createIntern() {
+      const name = document.getElementById("inName").value.trim();
+      const email = document.getElementById("inEmail").value.trim();
+      const batchId = document.getElementById("inBatch").value;
+      const duration = document.getElementById("inDuration").value;
+
+      const data = await apiGET({
+        action: "adminCreateInternGET",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass,
+        name, email, batchId, duration
+      });
+
+
+      if (data.success) {
+        toast("Intern Created ✅", "success");
+        document.getElementById("createdInternText").innerHTML =
+          `✅ InternID: <b>${data.internId}</b> | Batch: <b>${data.batchName}</b>`;
+        loadInterns();
+      } else toast(data.message, "error");
+    }
+
+
+
+    async function assignBatchTask() {
+      const date = document.getElementById("taskDate").value;
+      const batchId = document.getElementById("assignBatch").value;
+      const title = document.getElementById("taskTitle").value.trim();
+      const description = document.getElementById("taskDesc").value.trim();
+
+      const data = await apiPOST({
+        action: "adminAssignBatchTask",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass,
+        date, batchId, title, description
+      });
+      showLoader(false);
+
+      if (data.success) toast("Batch Task Assigned ✅", "success");
+      else toast(data.message, "error");
+    }
+
+    async function assignIndividualTask() {
+      const date = document.getElementById("taskDate").value;
+      const internId = document.getElementById("assignInternId").value.trim();
+      const title = document.getElementById("taskTitle").value.trim();
+      const description = document.getElementById("taskDesc").value.trim();
+
+      const data = await apiPOST({
+        action: "adminAssignIndividualTask",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass,
+        date, internId, title, description
+      });
+      showLoader(false);
+
+      if (data.success) toast("Individual Task Assigned ✅", "success");
+      else toast(data.message, "error");
+    }
+
+    async function loadSubmissions(silent = false) {
+      const data = await apiGET({
+        action: "getPendingSubmissions",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass
+      });
+      if (!data.success) { toast(data.message, "error"); return; }
+
+      const tb = document.getElementById("subsTable");
+      tb.innerHTML = "";
+
+      if ((data.submissions || []).length === 0) {
+        tb.innerHTML = `<tr><td colspan="9">No pending submissions ✅</td></tr>`;
+        return;
+      }
+
+      data.submissions.forEach(s => {
+        tb.innerHTML += `
+          <tr>
+            <td>${s.SubmissionID}</td>
+            <td class="internCell">
+  <b>${s.AssignedTaskID}</b>
+  <span class="internTooltip">
+    <b>${s.Title}</b><br/>
+    ${s.Description || ""}
+  </span>
+</td>
+            <td class="internCell">
+             <b>${s.InternID}</b>
+             <span class="internTooltip">${s.Name}</span>
+          </td>
+
+            <td><a href="${s.Link}" target="_blank" style="color:var(--p3);font-weight:900;">Open</a></td>
+            <td>${escapeHTML(s.Details || "-")}</td>
+            <td>${formatDate(s.SubmittedAt)}</td>
+            <td><input id="g_${s.SubmissionID}" placeholder="A / 10"/></td>
+            <td><input id="r_${s.SubmissionID}" placeholder="remarks"/></td>
+            <td style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn primary" onclick="grade('${s.SubmissionID}','Approved')">Approve</button>
+              <button class="btn danger" onclick="grade('${s.SubmissionID}','Rejected')">Reject</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    async function grade(submissionId, finalStatus) {
+      const grade = document.getElementById("g_" + submissionId).value.trim();
+      const remarks = document.getElementById("r_" + submissionId).value.trim();
+
+      const data = await apiPOST({
+        action: "adminGradeSubmission",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass,
+        submissionId,
+        finalStatus,
+        grade,
+        remarks
+      });
+      showLoader(false);
+
+      if (data.success) {
+        toast("Graded ✅", "success");
+        loadSubmissions();
+      } else toast(data.message, "error");
+    }
+
+    // ✅ Intern Overview Modal (Requires backend GET adminInternOverview)
+    function closeInternModal() {
+      document.getElementById("internModal").classList.remove("show");
+    }
+
+    async function openInternOverview(internId) {
+      document.getElementById("internModal").classList.add("show");
+      document.getElementById("modalMeta").innerText = "Loading intern data...";
+      document.getElementById("modalHistory").innerHTML = `<tr><td colspan="5">Loading...</td></tr>`;
+
+      const data = await apiGET({
+        action: "adminInternOverview",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass,
+        internId
+      });
+
+      if (!data.success) {
+        toast(data.message, "error");
+        closeInternModal();
+        return;
+      }
+
+      const I = data.intern;
+      document.getElementById("modalMeta").innerText =
+        `ID: ${I.InternID} | Name: ${escapeHTML(I.Name)} | Email: ${I.Email} | Batch: ${I.BatchName} | Duration: ${I.Duration}`;
+
+      document.getElementById("mStreak").innerText = data.streak || 0;
+      document.getElementById("mTotalSub").innerText = data.submissions.total || 0;
+      document.getElementById("mPending").innerText = data.submissions.pending.length || 0;
+      document.getElementById("mApproved").innerText = data.submissions.approved.length || 0;
+
+      const tb = document.getElementById("modalHistory");
+      tb.innerHTML = "";
+
+      const history = (data.history || []).slice(0, 50);
+
+      if (history.length === 0) {
+        tb.innerHTML = `<tr><td colspan="5">No history found ✅</td></tr>`;
+        return;
+      }
+
+      history.forEach(h => {
+        const subLink = h.SubmissionLink
+          ? `<a href="${h.SubmissionLink}" target="_blank" style="color:var(--p3);font-weight:900;">Open</a>`
+          : "-";
+
+        tb.innerHTML += `
+          <tr>
+          <td>${formatDate(h.Date)}</td>
+            <td>
+                <b>${h.Title}</b>
+               <div class="taskDesc">
+               ${h.Description || ""}
+               </div>
+
+            ${h.Description ?
+            `<span class="viewBtn" onclick="toggleDesc(this)">View More</span>`
+            : ""
+          }
+          </td>
+            <td>${h.Status || "-"}</td>
+            <td><b>${h.Grade || "Not Seen"}</b></td>
+            <td>${subLink}</td>
+          </tr>
+        `;
+      });
+    }
+
+    // ✅ default date for incomplete
+    const incDate = document.getElementById("incompleteDate");
+    if (incDate) {
+      incDate.value = new Date().toISOString().slice(0, 10);
+    }
+
+    async function loadIncomplete(silent = false) {
+
+      const data = await apiGET({
+        action: "getIncompleteStudents",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass
+      });
+
+
+      if (!data.success) {
+        toast(data.message, "error");
+        return;
+      }
+
+      const tb = document.getElementById("incompleteTable");
+      tb.innerHTML = "";
+
+      const list = data.students || [];
+
+      // ✅ Total Count Set
+      document.getElementById("incompleteCount").innerText = list.length;
+
+      if (list.length === 0) {
+        tb.innerHTML = `<tr><td colspan="6">✅ No incomplete students</td></tr>`;
+        return;
+      }
+
+      list.forEach(s => {
+        tb.innerHTML += `
+      <tr>
+        <td><b>${s.InternID}</b></td>
+        <td>${s.Name}</td>
+        <td>${s.Email}</td>
+        <td>${s.BatchName}</td>
+        <td><b>${s.PendingTasks}</b></td>
+        <td>
+          <button class="btn" onclick="openChat('${s.InternID}','${s.Name}')">💬 Message</button>
+        </td>
+      </tr>
+    `;
+      });
+
+    }
+
+    // ✅ Chat state
+    let CURRENT_CHAT_INTERN = "";
+
+    function closeChat() {
+      document.getElementById("chatModal").classList.remove("show");
+      CURRENT_CHAT_INTERN = "";
+    }
+
+    async function openChat(internId, name) {
+      CURRENT_CHAT_INTERN = internId;
+      document.getElementById("chatModal").classList.add("show");
+      document.getElementById("chatMeta").innerText = `Intern: ${name} (${internId}) | Auto delete in 48h`;
+      await loadChatMessages();
+    }
+
+    async function loadChatMessages(silent = false) {
+      const data = await apiGET({
+        action: "getChat",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass,
+        internId: CURRENT_CHAT_INTERN
+      });
+
+      const tb = document.getElementById("chatTable");
+      tb.innerHTML = "";
+
+      if (!data.success) {
+        tb.innerHTML = `<tr><td colspan="3">${data.message}</td></tr>`;
+        return;
+      }
+
+      if ((data.messages || []).length === 0) {
+        tb.innerHTML = `<tr><td colspan="3">No messages ✅</td></tr>`;
+        return;
+      }
+
+      data.messages.forEach(m => {
+        tb.innerHTML += `
+      <tr>
+        <td><b>${m.Sender}</b></td>
+        <td>${escapeHTML(m.Message)}</td>
+        <td>${formatDate(m.CreatedAt)}</td>
+      </tr>
+    `;
+      });
+    }
+
+    async function adminSendMsg() {
+      const message = document.getElementById("chatMsg").value.trim();
+      if (!message) { toast("Message empty ❌", "error"); return; }
+
+      const data = await apiGET({
+        action: "sendMessageGET",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass,
+        internId: CURRENT_CHAT_INTERN,
+        sender: "Admin",
+        message
+      });
+
+      if (data.success) {
+        toast("Sent ✅", "success");
+        document.getElementById("chatMsg").value = "";
+        loadChatMessages(true); // ✅ reload silently
+      } else {
+        toast(data.message, "error");
+      }
+    }
+
+
+    async function adminClearChat() {
+      const data = await apiGET({
+        action: "clearChatGET",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass,
+        internId: CURRENT_CHAT_INTERN,
+        by: "Admin"
+      });
+
+      if (data.success) {
+        toast("Chat cleared ✅", "success");
+        loadChatMessages();
+      } else toast(data.message, "error");
+    }
+
+
+    let AUTO_REFRESH_TIMER = null;
+
+    function startAutoRefreshAdmin() {
+      if (AUTO_REFRESH_TIMER) clearInterval(AUTO_REFRESH_TIMER);
+
+      AUTO_REFRESH_TIMER = setInterval(async () => {
+        if (document.hidden) return;
+
+        const activePage = document.querySelector(".pageSection.active")?.id || "";
+
+        if (activePage === "studentsPage") await loadInterns(true);
+        // if(activePage === "subsPage") await loadSubmissions(true);
+        if (activePage === "incompletePage") await loadIncomplete(true);
+
+        if (document.getElementById("chatModal")?.classList.contains("show")) {
+          await loadChatMessages(true);
+        }
+
+      }, 4000); // ✅ 4 sec smooth
+    }
+
+    async function loadInterns(silent = false) {
+
+      const requestId = ++currentInternRequestId;  // 🔥 new token
+
+
+      // const batchId = document.getElementById("filterBatch").value;
+      const filterEl = document.getElementById("filterBatch");
+      const batchId = filterEl ? filterEl.value : "";
+
+      const data = await apiGET({
+        action: "getInternsList",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass,
+        batchId
+      });
+
+      // 🔥 If this is NOT latest request → ignore response
+      if (requestId !== currentInternRequestId) return;
+
+      if (!data.success) {
+        if (!silent) toast(data.message, "error");
+        return;
+      }
+
+      const tb = document.getElementById("internTable");
+      tb.innerHTML = "";
+
+      const list = data.interns || [];
+
+      document.getElementById("batchCount").innerText = list.length;
+
+      if (list.length === 0) {
+        tb.innerHTML = `<tr><td colspan="6">No interns found ✅</td></tr>`;
+        return;
+      }
+
+      list.forEach(i => {
+        tb.innerHTML += `
+      <tr>
+        <td><b>${i.InternID}</b></td>
+        <td>${i.Name}</td>
+        <td>${i.Email}</td>
+        <td>${i.BatchName}</td>
+        <td>${i.Duration}</td>
+        <td>
+          <button class="dotBtn" onclick="openInternOverview('${i.InternID}')">⋮</button>
+        </td>
+      </tr>
+    `;
+      });
+    }
+
+
+    async function loadAnalytics() {
+
+
+      const data = await apiGET({
+        action: "getAdminAnalytics",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass
+      });
+
+
+      if (!data.success) {
+        toast(data.message, "error");
+        return;
+      }
+
+      const k = data.kpis;
+
+      document.getElementById("kTotal").innerText = k.totalInterns;
+      document.getElementById("kActive").innerText = k.activeInterns;
+      document.getElementById("kPending").innerText = k.pending;
+      document.getElementById("kApproved").innerText = k.approved;
+      document.getElementById("kPercent").innerText = k.approvalPercent + "%";
+      document.getElementById("kAvg").innerText = k.avgGrade || 0;
+      document.getElementById("kDay").innerText = k.mostActiveDay || "-";
+
+
+
+      // ===== BATCH PERFORMANCE COLUMN CHART =====
+      const b = data.charts.batch;
+      const box = document.getElementById("batchPerformanceBox");
+
+      box.innerHTML = "";
+
+      b.labels.forEach((label, i) => {
+
+        const percent = b.data[i];
+
+        box.innerHTML += `
+    <div class="colItem">
+      <div class="colPercent">${percent}%</div>
+      <div class="colBarWrap">
+        <div class="colBar" data-height="${percent}"></div>
+      </div>
+      <div class="colLabel">${label}</div>
+    </div>
+  `;
+      });
+
+      // 🔥 Animate bars
+      setTimeout(() => {
+        document.querySelectorAll(".colBar").forEach(bar => {
+          bar.style.height = bar.getAttribute("data-height") + "%";
+        });
+      }, 200);
+
+      // 🔥 Animate bars
+      setTimeout(() => {
+        document.querySelectorAll(".perfFill").forEach(el => {
+          el.style.width = el.getAttribute("data-width") + "%";
+        });
+      }, 200);
+
+      const topBox = document.getElementById("topInternsBox");
+      topBox.innerHTML = "";
+
+      const topData = data.charts.topInterns || {};
+
+      Object.keys(topData).forEach(batchName => {
+
+        const batchInterns = topData[batchName];
+
+        let html = `
+    <div class="topBatchBlock">
+      <div class="topBatchTitle">${batchName}</div>
+  `;
+
+        batchInterns.slice(0, 3).forEach((intern, index) => {
+
+          let medal = "";
+          if (index === 0) medal = "🥇";
+          else if (index === 1) medal = "🥈";
+          else if (index === 2) medal = "🥉";
+          else medal = `#${index + 1}`;
+
+          html += `
+      <div class="topInternCard">
+        <div class="topInternLeft">
+          <div class="rankBadge">${medal}</div>
+          <div class="topInternName">${intern.name}</div>
+        </div>
+        <div class="topInternScore">
+        ${intern.avg}/100
+        </div>
+      </div>
+    `;
+        });
+
+        html += `
+  <button class="btn ghost" 
+    style="margin-top:8px;font-size:11px;"
+    onclick="openFullBatchAnalysis('${batchName}')">
+    View Full Analysis
+  </button>
+`;
+
+        html += `</div>`;
+        topBox.innerHTML += html;
+
+      });
+
+    }
+
+    async function openFullBatchAnalysis(batchName) {
+
+      const data = await apiGET({
+        action: "getAdminAnalytics",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass
+      });
+
+
+      if (!data.success) {
+        toast(data.message, "error");
+        return;
+      }
+
+      const batchInterns = data.charts.topInterns[batchName] || [];
+
+      const tb = document.getElementById("analysisTable");
+      tb.innerHTML = "";
+
+      batchInterns.forEach((intern, index) => {
+        tb.innerHTML += `
+      <tr>
+        <td>#${index + 1}</td>
+        <td>${intern.name}</td>
+        <td>${intern.avg}/100</td>
+        <td>${intern.approvedCount}</td>
+      </tr>
+    `;
+      });
+
+      document.getElementById("analysisModal").classList.add("show");
+    }
+
+    function closeAnalysis() {
+      document.getElementById("analysisModal").classList.remove("show");
+    }
+
+    function getDeviceInfo() {
+
+      const ua = navigator.userAgent;
+
+      let device = "Desktop";
+      if (/mobile/i.test(ua)) device = "Mobile";
+      if (/tablet/i.test(ua)) device = "Tablet";
+
+      return {
+        device,
+        browser: ua,
+        location: "Unknown",
+        ip: "-"
+      };
+    }
+
+    async function loadEditRequests(silent = false) {
+
+      const data = await apiGET({
+        action: "getEditRequests",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass
+      });
+
+      const tb = document.getElementById("editReqTable");
+      tb.innerHTML = "";
+
+      if (!data.success) {
+        toast(data.message, "error");
+        return;
+      }
+
+      const list = data.requests || [];
+
+      if (list.length === 0) {
+        tb.innerHTML = `<tr><td colspan="6">No edit requests ✅</td></tr>`;
+        return;
+      }
+
+      list.forEach(r => {
+        tb.innerHTML += `
+      <tr>
+        <td><b>${r.SubmissionID}</b></td>
+        <td>${r.InternID}</td>
+        <td>${r.AssignedTaskID}</td>
+        <td>${formatDate(r.RequestedAt)}</td>
+        <td>
+          <span style="
+            padding:4px 8px;
+            border-radius:10px;
+            background:rgba(255,165,0,0.15);
+            border:1px solid rgba(255,165,0,0.3);
+            font-weight:700;
+            font-size:12px;">
+            ${r.EditRequestStatus}
+          </span>
+        </td>
+        <td style="display:flex;gap:8px;">
+          <button class="btn primary"
+            onclick="approveEdit('${r.SubmissionID}', true)">
+            Approve
+          </button>
+          <button class="btn danger"
+            onclick="approveEdit('${r.SubmissionID}', false)">
+            Reject
+          </button>
+        </td>
+      </tr>
+    `;
+      });
+    }
+
+    async function approveEdit(submissionId, approve) {
+
+      const data = await apiPOST({
+        action: "adminApproveEdit",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass,
+        submissionId,
+        approve
+      });
+
+      if (data.success) {
+        toast("Updated ✅", "success");
+        loadEditRequests(true);
+      } else {
+        toast(data.message, "error");
+      }
+    }
+
+    async function sendAdminLoginInfo() {
+
+      if (!admin || !admin.adminId) return;
+
+      const info = {
+        action: "adminLoginAlert",
+        adminId: admin.adminId,
+        adminPass: admin.adminPass,
+        device: navigator.userAgent,
+        location: "Unknown",
+        ip: "-"
+      };
+
+      await apiPOST(info);
+    }
+
+
+
+    // Toggle sidebar (mobile)
+    function toggleSidebar() {
+      const sidebar = document.querySelector(".sidebar");
+      if (!sidebar) return;
+      sidebar.classList.toggle("show");
+    }
+
+
+    // Close sidebar after navigation click (mobile only)
+    function closeSidebarMobile() {
+      if (window.innerWidth <= 1000) {
+        const sidebar = document.querySelector(".sidebar");
+        if (sidebar) sidebar.classList.remove("show");
+      }
+    }
+
+
+    // Click outside to close (mobile)
+    document.addEventListener("click", function (e) {
+
+      if (window.innerWidth > 1000) return;
+
+      const sidebar = document.querySelector(".sidebar");
+      const mobileBtn = document.querySelector(".mobileMenuBtn");
+
+      if (!sidebar || !mobileBtn) return;
+
+      if (!sidebar.contains(e.target) && !mobileBtn.contains(e.target)) {
+        sidebar.classList.remove("show");
+      }
+
+    });
+
+    function formatDate(dateString) {
+      if (!dateString) return "-";
+
+      const d = new Date(dateString);
+
+      const day = String(d.getDate()).padStart(2, "0");
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const year = d.getFullYear();
+
+      return `${day}/${month}/${year}`;
+    }
+
+    function toggleDesc(btn) {
+
+      const desc = btn.parentElement.querySelector(".taskDesc");
+
+      desc.classList.toggle("show");
+
+      btn.innerText = desc.classList.contains("show")
+        ? "View Less"
+        : "View More";
+    }
+
+
+    init();
+    // startAutoRefreshAdmin();
+
+    window.addEventListener("beforeunload", function () {
+      if (AUTO_REFRESH_TIMER) clearInterval(AUTO_REFRESH_TIMER);
+    });
+  </script>
+</body>
+
+</html>
